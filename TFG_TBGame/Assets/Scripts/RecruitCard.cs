@@ -10,17 +10,33 @@ public class RecruitCard : MonoBehaviour
     private bool isTaken;
     public int tools;
 
+    public bool isBeingRecruited;
+
+    public Color tempColor;
+
+    //private Vector3 initialPosition;
+     
     public GameManager gm;
 
    private void OnMouseDown() {
-        if(isTaken == false){
-            for(int i=0;i<3;i++){
-                if(gm.availableCardSlotsRecruit[i]==true){
-                    transform.position = gm.yourRecruitSlots[i].position;
-                    gm.availableCardSlotsRecruit[i]=false;
-                    return;
-                }
-            }
+        if(isTaken == false&&!gm.recruitIsBeingRecruited){
+            //initialPosition = transform.position;
+            GetComponent<Renderer>().material.color = Color.red;
+            gm.recruitIsBeingRecruited=true;
+            gm.cardBeingRecruited=this;
+            isBeingRecruited=true;
+            gm.ActivateButtons(true);
+            return;
+        }
+        if(isBeingRecruited){
+            GetComponent<Renderer>().material.color = tempColor;
+            //transform.position = initialPosition;
+            isBeingRecruited = false;
+            gm.cardBeingRecruited = null;
+            gm.recruitIsBeingRecruited = false;
+            gm.ActivateButtons(false);
+            gm.UnhighlightTools();
+            return;
         }
     }
 
@@ -28,11 +44,30 @@ public class RecruitCard : MonoBehaviour
     void Start()
     {
         gm = FindObjectOfType<GameManager>();
+        tempColor = GetComponent<Renderer>().material.color;
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public int PutRecruitedInZone()
+    {
+        int pos=-1;
+        for (int i = 0; i < 3; i++)
+        {
+            if (gm.availableCardSlotsRecruit[i] == true)
+            {
+                transform.position = gm.yourRecruitSlots[i].position;
+                gm.availableCardSlotsRecruit[i] = false;
+                pos=i;
+                break;
+            }
+        }
+        GetComponent<Renderer>().material.color = tempColor;
+        isTaken=true;
+        return pos;
     }
 }
