@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-enum GamePhase
+public enum GamePhase
 {
     Recruit,
     Learn,
@@ -21,27 +21,24 @@ public class GameManager : MonoBehaviour
     public Transform[] shopSlots;
     public Transform[] yourRecruitSlots;
     public bool[] availableCardSlotsRecruit;
-
     private ToolCard[] yourToolHand = new ToolCard[8];
-
     private RecruitCard[] yourRecruitHand = new RecruitCard[3];
+    public RecruitCard recruitBeingUsed;
+    public bool isRecruitBeingUsed;
+    public List<string> matchingTools = new List<string>();
 
-    public RecruitCard cardBeingRecruited;
-
-    public bool recruitIsBeingRecruited;
-
-    //private ToolCard[] toolsToBeDiscardedInRecruitment;
+    public Transform[] yourToolboardSlots;
 
     public Text message;
-
-    private GamePhase phase;
-
     public ButtonUI OkButton;
+
+    public GamePhase phase;
 
     // Start is called before the first frame update
     void Start()
     {
         BeginRecruit();
+        Invoke("BeginLearn",10);
     }
 
     // Update is called once per frame
@@ -49,8 +46,6 @@ public class GameManager : MonoBehaviour
     {
         
     }
-
-  
 
     public void BeginRecruit(){
         phase = GamePhase.Recruit;
@@ -108,24 +103,41 @@ public class GameManager : MonoBehaviour
     }
 
     public void OK(){
-        int discardedNumForRecruit = 0;
-        if(recruitIsBeingRecruited){
-            for(int i=0;i<toolCardSlots.Length;i++){
-                if(yourToolHand[i].isBeingDiscarded){
-                    discardedNumForRecruit++;
-                }
-            }
-            if(discardedNumForRecruit==cardBeingRecruited.tools){
-                for(int i=0;i<toolCardSlots.Length;i++){
-                    if(yourToolHand[i].isBeingDiscarded){
-                        yourToolHand[i].gameObject.SetActive(false);
-                    }
-                }
-                yourRecruitHand[cardBeingRecruited.PutRecruitedInZone()]=cardBeingRecruited;
-                cardBeingRecruited=null;
+        if (isRecruitBeingUsed && phase == GamePhase.Recruit){
+            if (CountDiscarded() == recruitBeingUsed.tools){
+                DiscardTools();
+                yourRecruitHand[recruitBeingUsed.PutRecruitedInZone()] = recruitBeingUsed;
+                recruitBeingUsed = null;
             }
         }
-        
+        else if (isRecruitBeingUsed && phase == GamePhase.Learn){
+            matchingTools.Clear();
+            for (int i = 0; i < toolCardSlots.Length; i++){
+                if (yourToolHand[i].isBeingDiscarded){
+                    string tagTool = yourToolHand[i].tag;
+                    if (recruitBeingUsed.toolPool.Contains(tagTool)){
+                        if (matchingTools.Contains(tagTool)){
+                            return;
+                        }
+                        matchingTools.Add(tagTool);
+                    }
+                    else{
+                        return;
+                    }
+                }
+            }
+            for (int i = 0; i < toolCardSlots.Length; i++){
+                ToolCard tool = yourToolHand[i];
+                if (tool.isBeingDiscarded){
+                    for(int j=0; j<yourToolboardSlots.Length;j++){
+                        if(yourToolboardSlots[j].tag==tool.tag){
+                            tool.transform.position = yourToolboardSlots[j].transform.position;
+                        }
+                    }
+                }
+            }
+            recruitBeingUsed.gameObject.SetActive(false);
+        }
     }
 
     public void ActivateButtons(bool action){
@@ -136,6 +148,27 @@ public class GameManager : MonoBehaviour
         for(int i=0;i<toolCardSlots.Length;i++){
             yourToolHand[i].isBeingDiscarded=false;
             yourToolHand[i].GetComponent<Renderer>().material.color = yourToolHand[i].tempColor;
+        }
+    }
+
+    private int CountDiscarded(){
+        int discardedNumForRecruit = 0;
+        for(int i=0;i<toolCardSlots.Length;i++){
+            if(yourToolHand[i].isBeingDiscarded){
+                discardedNumForRecruit++;
+            }
+        }
+        return discardedNumForRecruit;
+    }
+
+    private void DiscardTools()
+    {
+        for (int i = 0; i < toolCardSlots.Length; i++)
+        {
+            if (yourToolHand[i].isBeingDiscarded)
+            {
+                yourToolHand[i].gameObject.SetActive(false);
+            }
         }
     }
 }

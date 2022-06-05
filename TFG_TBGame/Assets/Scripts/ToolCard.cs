@@ -42,7 +42,7 @@ public class ToolCard : MonoBehaviour
     }
 
     private void OnMouseDown() {
-        if(gm.recruitIsBeingRecruited&&!isBeingDiscarded){
+        if(gm.isRecruitBeingUsed&&!isBeingDiscarded){
             GetComponent<Renderer>().material.color = Color.red;
             isBeingDiscarded=true;
             return;

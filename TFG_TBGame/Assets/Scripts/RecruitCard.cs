@@ -6,36 +6,33 @@ using UnityEngine;
 public class RecruitCard : MonoBehaviour
 {
 
-    public bool[] toolPool;
+    public List<ToolCard> toolPoolCards = new List<ToolCard>();
+    public List<string> toolPool = new List<string>();
     private bool isTaken;
     public int tools;
 
-    public bool isBeingRecruited;
+    public bool isBeingUsed;
 
     public Color tempColor;
-
-    //private Vector3 initialPosition;
      
     public GameManager gm;
 
    private void OnMouseDown() {
-        if(isTaken == false&&!gm.recruitIsBeingRecruited){
-            //initialPosition = transform.position;
-            GetComponent<Renderer>().material.color = Color.red;
-            gm.recruitIsBeingRecruited=true;
-            gm.cardBeingRecruited=this;
-            isBeingRecruited=true;
-            gm.ActivateButtons(true);
+        if(isTaken == false&&!gm.recruitBeingUsed){
+            useRecruit();
             return;
         }
-        if(isBeingRecruited){
+        if(isBeingUsed){
             GetComponent<Renderer>().material.color = tempColor;
-            //transform.position = initialPosition;
-            isBeingRecruited = false;
-            gm.cardBeingRecruited = null;
-            gm.recruitIsBeingRecruited = false;
+            isBeingUsed = false;
+            gm.recruitBeingUsed = null;
+            gm.isRecruitBeingUsed = false;
             gm.ActivateButtons(false);
             gm.UnhighlightTools();
+            return;
+        }
+        if(isTaken&&gm.phase==GamePhase.Learn){
+            useRecruit();
             return;
         }
     }
@@ -45,6 +42,9 @@ public class RecruitCard : MonoBehaviour
     {
         gm = FindObjectOfType<GameManager>();
         tempColor = GetComponent<Renderer>().material.color;
+        foreach(ToolCard t in toolPoolCards){
+            toolPool.Add(t.tag);
+        }
     }
 
     // Update is called once per frame
@@ -69,5 +69,13 @@ public class RecruitCard : MonoBehaviour
         GetComponent<Renderer>().material.color = tempColor;
         isTaken=true;
         return pos;
+    }
+
+    private void useRecruit(){
+        GetComponent<Renderer>().material.color = Color.red;
+        gm.isRecruitBeingUsed=true;
+        gm.recruitBeingUsed=this;
+        isBeingUsed=true;
+        gm.ActivateButtons(true);
     }
 }
