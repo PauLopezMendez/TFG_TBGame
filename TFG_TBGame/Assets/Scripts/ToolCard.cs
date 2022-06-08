@@ -18,8 +18,6 @@ public class ToolCard : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    public int toolType;
-
     public GameManager gm;
 
     public Color tempColor;

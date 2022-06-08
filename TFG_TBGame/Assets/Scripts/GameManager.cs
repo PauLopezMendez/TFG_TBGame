@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using Colyseus;
+
 public enum GamePhase
 {
     Recruit,
@@ -19,6 +21,8 @@ public class GameManager : MonoBehaviour
     public Transform[] toolCardSlots;
     public bool[] availableCardSlotsHand;
     public Transform[] shopSlots;
+    private List<RecruitCard> recruitsShop = new List<RecruitCard>();
+    private List<RecruitCard> discardedRecruits = new List<RecruitCard>();
     public Transform[] yourRecruitSlots;
     public bool[] availableCardSlotsRecruit;
     private ToolCard[] yourToolHand = new ToolCard[8];
@@ -26,6 +30,8 @@ public class GameManager : MonoBehaviour
     public RecruitCard recruitBeingUsed;
     public bool isRecruitBeingUsed;
     public List<string> matchingTools = new List<string>();
+
+    private HashSet<string> toolboardToolsGot = new HashSet<string>();
 
     public Transform[] yourToolboardSlots;
 
@@ -38,7 +44,10 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         BeginRecruit();
-        Invoke("BeginLearn",10);
+        Invoke("BeginLearn",5);
+        Invoke("BeginRecruit",10);
+        Invoke("BeginLearn",15);
+
     }
 
     // Update is called once per frame
@@ -74,6 +83,7 @@ public class GameManager : MonoBehaviour
 
     public void ShowResult(){
         phase = GamePhase.Result;
+        message.text = "Game Over";
     }
 
       private void DrawToolCards(){
@@ -92,13 +102,20 @@ public class GameManager : MonoBehaviour
     }
 
     private void PutRecruitCards(){
-        if(recruitDeck.Count >1){
-            for(int i = 0; i<4; i++){
-                RecruitCard card = recruitDeck[Random.Range(0,recruitDeck.Count)];
-                card.gameObject.SetActive(true);
-                card.transform.position = shopSlots[i].position;
-                recruitDeck.Remove(card);
+        foreach(RecruitCard rc in recruitsShop){
+            rc.gameObject.SetActive(false);
+            discardedRecruits.Add(rc);
+        }
+        recruitsShop.Clear();
+        for(int i = 0; i<4; i++){
+            if(recruitDeck.Count<=0){
+                recruitDeck=discardedRecruits;
             }
+            RecruitCard card = recruitDeck[Random.Range(0,recruitDeck.Count)];
+            recruitsShop.Add(card);
+            card.gameObject.SetActive(true);
+            card.transform.position = shopSlots[i].position;
+            recruitDeck.Remove(card);
         }
     }
 
@@ -126,17 +143,21 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
+            recruitBeingUsed.gameObject.SetActive(false);
             for (int i = 0; i < toolCardSlots.Length; i++){
                 ToolCard tool = yourToolHand[i];
                 if (tool.isBeingDiscarded){
                     for(int j=0; j<yourToolboardSlots.Length;j++){
                         if(yourToolboardSlots[j].tag==tool.tag){
                             tool.transform.position = yourToolboardSlots[j].transform.position;
+                            toolboardToolsGot.Add(tool.tag);
+                            if(toolboardToolsGot.Count==9){
+                                ShowResult();
+                            }
                         }
                     }
                 }
             }
-            recruitBeingUsed.gameObject.SetActive(false);
         }
     }
 
