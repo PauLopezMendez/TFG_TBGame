@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 using Colyseus;
 
@@ -40,14 +41,31 @@ public class GameManager : MonoBehaviour
 
     public GamePhase phase;
 
+    private GameClient client;
+    private State state;
+    private int myPlayerNumber;
+
     // Start is called before the first frame update
     void Start()
     {
-        BeginRecruit();
-        Invoke("BeginLearn",5);
-        Invoke("BeginRecruit",10);
-        Invoke("BeginLearn",15);
+        //client = GameClient.Instance;
 
+        if(client.Connected){
+            SceneManager.LoadScene("ConnectingScene");
+            return;
+        }
+        client.OnInitialState += InitialStateHandler;
+        client.OnGamePhaseChange += GamePhaseChangeHandler;
+
+        if(client.State != null){
+            InitialStateHandler(this, client.State);
+        }
+
+    }
+
+    private void OnDestroy(){
+        client.OnInitialState -= InitialStateHandler;
+        client.OnGamePhaseChange -= GamePhaseChangeHandler;
     }
 
     // Update is called once per frame
@@ -190,6 +208,70 @@ public class GameManager : MonoBehaviour
             {
                 yourToolHand[i].gameObject.SetActive(false);
             }
+        }
+    }
+
+    //networking
+
+    private void InitialStateHandler (object sender, State initialState){
+        state = initialState;
+
+        Player me = state.players[client.SessionId];
+
+        myPlayerNumber = me != null ? me.seat : -1;
+
+        state.OnChange += StateChangeHandler;
+
+        GamePhaseChangeHandler(this, state.phase);
+    }
+
+    private void StateChangeHandler(object sender, Colyseus.Schema.OnChangeEventArgs args){
+        foreach (var change in args.Changes){
+            if (change.Field == "playerTurn" && state.phase == "Recruit"){
+                CheckTurnRecruit();
+            }
+            else if (change.Field == "playerTurn" && state.phase == "Learn"){
+                CheckTurnLearn();
+            }
+        }
+    }
+
+    private void CheckTurnRecruit(){
+        if(state.playerTurn == myPlayerNumber){
+            BeginRecruit();
+        }
+        else{
+            WaitForOpponentToRecruit();
+        }
+    }
+
+    private void CheckTurnLearn(){
+        if(state.playerTurn == myPlayerNumber){
+            BeginLearn();
+        }
+        else{
+            WaitForOpponentLearn();
+        }
+    }
+
+    private void Leave (){
+        client.Leave();
+        SceneManager.LoadScene("ConnectingScene");
+    }
+
+    private void GamePhaseChangeHandler(object sender, string phase){
+        switch (phase){
+            case "waiting":
+                break;
+            case "Recruit":
+                CheckTurnRecruit();
+                break;
+            case "Learn":
+                CheckTurnLearn();
+                break;
+            case "Result":
+                ShowResult();
+                break;
         }
     }
 }
