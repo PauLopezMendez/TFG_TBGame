@@ -24,6 +24,8 @@ public class ToolCard : MonoBehaviour
 
     public bool isBeingDiscarded;
 
+    public string id;
+
 
     
     void Start()

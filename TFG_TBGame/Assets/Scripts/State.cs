@@ -12,18 +12,24 @@ public partial class State : Schema {
 	public MapSchema<Player> players = new MapSchema<Player>();
 
 	[Type(1, "string")]
-	public string phase = default(string);
+	public string phase = "";
 
 	[Type(2, "int16")]
-	public short playerTurn = default(short);
+	public short playerTurn = 0;
 
 	[Type(3, "int16")]
-	public short winningPlayer = default(short);
+	public short winningPlayer = 0;
 
-	[Type(4, "array", typeof(ArraySchema<bool>))]
-	public ArraySchema<bool> shop = new ArraySchema<bool>();
+	[Type(4, "array", "string")]
+	public ArraySchema<string> cards = new ArraySchema<string>();
 
 	[Type(5, "int16")]
-	public short playersSkipped = default(short);
+	public short playersSkipped = 0;
+
+	[Type(6, "array", "string")]
+	public ArraySchema<string> recruitsToDestroy = new ArraySchema<string>();
+
+	[Type(7, "boolean")]
+	public bool firstTurn = true;
 }
 

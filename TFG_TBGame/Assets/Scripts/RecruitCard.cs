@@ -14,6 +14,12 @@ public class RecruitCard : MonoBehaviour
     public bool isBeingUsed;
 
     public Color tempColor;
+
+    public int position;
+
+    public string id;
+
+    
      
     public GameManager gm;
 
@@ -37,6 +43,14 @@ public class RecruitCard : MonoBehaviour
         }
     }
 
+    public void UnhighlightRecruit(){
+        GetComponent<Renderer>().material.color = tempColor;
+        isBeingUsed = false;
+        gm.recruitBeingUsed = null;
+        gm.isRecruitBeingUsed = false;
+        gm.ActivateButtons(false);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -51,24 +65,6 @@ public class RecruitCard : MonoBehaviour
     void Update()
     {
         
-    }
-
-    public int PutRecruitedInZone()
-    {
-        int pos=-1;
-        for (int i = 0; i < 3; i++)
-        {
-            if (gm.availableCardSlotsRecruit[i] == true)
-            {
-                transform.position = gm.yourRecruitSlots[i].position;
-                gm.availableCardSlotsRecruit[i] = false;
-                pos=i;
-                break;
-            }
-        }
-        GetComponent<Renderer>().material.color = tempColor;
-        isTaken=true;
-        return pos;
     }
 
     private void useRecruit(){

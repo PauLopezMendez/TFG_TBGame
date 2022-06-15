@@ -1,12 +1,12 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using Colyseus;
 using Colyseus.Schema;
+using System;
 
-public class GameClient : MonoBehaviour
+public class GameClient : GenericSingleton<GameClient>
 {
     public EventHandler OnConnect;
     public EventHandler OnClose;
@@ -22,18 +22,6 @@ public class GameClient : MonoBehaviour
     public string ClientId
     {
         get { return client?.Id; }
-    }
-
-    public void getA(){
-       client.GetAvailableRooms("cualquiercosa", (RoomAvailable[] rooms) => {
-        if(rooms.Length==0){
-            print("huevada");
-        }
-        for (int i = 0; i < rooms.Length; i++) {
-            Debug.Log(rooms[i].roomId);
-            Debug.Log(rooms[i].clients);
-        }
-    });
     }
 
     public string SessionId
@@ -58,34 +46,33 @@ public class GameClient : MonoBehaviour
 
     void OnDestroy()
     {
+        
+        print("OnDestroy");
         if (client != null) client.Close();
     }
 
     private void OnApplicationQuit()
     {
+        print("OnApplicationQuit");
         if (room != null) room.Leave();
         if (client != null) client.Close();
     }
 
     public void Connect()
     {
-        string uri = "ws://localhost:13757";
+        print("Connect");
+        string uri = "ws://localhost:2567";
         client = new Client(uri);
         client.OnOpen += OnOpenHandler;
         client.OnClose += OnCloseHandler;
-
         StartCoroutine(ConnectAndListen());
-        print("aaaa");
-        //StartCoroutine(client.Connect());
     }
 
     public void Join()
     {
-        room = client.Join<State>("cualquiercosa");
-        print(room.Id);
-        room.OnReadyToConnect += (sender, e) => {
-            print("joineando");
-            StartCoroutine(room.Connect());};
+        print("Join");
+        room = client.Join<State>("game");
+        room.OnReadyToConnect += (sender, e) => StartCoroutine(room.Connect());
         room.OnMessage += OnMessageHandler;
         room.OnJoin += OnJoinHandler;
         room.OnStateChange += OnRoomStateChangeHandler;
@@ -97,15 +84,32 @@ public class GameClient : MonoBehaviour
         room = null;
     }
 
-    // public void SendPlacement(int[] placement)
-    // {
-    //     room.Send(new { command = "place", placement });
-    // }
+    public void InitialState (){
+        room.Send(new { command = "initialState"});
+    }
 
-    // public void SendTurn(int targetIndex)
-    // {
-    //     room.Send(new { command = "turn", targetIndex });
-    // }
+    public void RefreshShop (){
+        room.Send(new { command = "refreshShop"});
+    }
+
+    public void DestroyRecruits(string[][] idCardsDestroy){
+        room.Send(new { command = "destroyRecruits", idCardsDestroy});
+    }
+
+    public void NullRecruit(string idToNull){
+        room.Send(new { command = "nullRecruit", idToNull});
+    }
+
+    public void SendRecruited (string cardId,int oldPos, int newPos){
+        room.Send(new { command = "recruited", cardId, oldPos, newPos});
+    }
+
+    public void SendLearn (string cardId, int posCard, string[] tools){
+        room.Send(new { command = "learn", cardId, posCard, tools});
+    }
+    public void SendSkip (){
+        room.Send(new { command = "skip"});
+    }
 
     // handlers
 
@@ -116,11 +120,13 @@ public class GameClient : MonoBehaviour
 
     void OnCloseHandler(object sender, EventArgs e)
     {
+        
         OnClose?.Invoke(this, e);
     }
 
     void OnJoinHandler(object sender, EventArgs e)
     {
+        
         room.State.OnChange += OnStateChangeHandler;
 
         OnJoin?.Invoke(this, e);

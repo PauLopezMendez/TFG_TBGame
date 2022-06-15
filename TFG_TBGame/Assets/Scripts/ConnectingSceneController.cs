@@ -12,6 +12,8 @@ public class ConnectingSceneController : MonoBehaviour
 
     private GameClient client;
 
+    private bool hasNotStarted = true;
+
     void Start()
     {
         message.text = "Connecting...";
@@ -20,38 +22,31 @@ public class ConnectingSceneController : MonoBehaviour
         client.OnConnect += OnConnect;
         client.OnJoin += OnJoin;
 
-        // if (!client.Connected)
-        // {
-        //     client.Connect();
-        // }
-        // else
-        // {
-        //     OnConnect(this, null);
-        // }
-
-        client.Connect();
+        if (!client.Connected)
+        {
+            client.Connect();
+        }
+        else
+        {
+            OnConnect(this, null);
+        }
     }
 
     void Update(){
-        print(client.Connected)
-;        if(Input.GetKeyDown(KeyCode.J)){
-            client.getA();
-        }
-         if(Input.GetKeyDown(KeyCode.K)){
-            client.Join();
-        }
+;      
     }
 
     void OnConnect(object sender, EventArgs e)
     {
         message.text = "Finding a game...";
+        
 
         if (!client.Joined)
         {
             client.Join();
         }
         else
-        {            
+        {         
             OnJoin(this, null);
         }
     }
@@ -59,14 +54,16 @@ public class ConnectingSceneController : MonoBehaviour
     void OnJoin(object sender, EventArgs e)
     {
         message.text = "Joined! Finding another player...";
-
+        
         client.OnGamePhaseChange += GamePhaseChangeHandler;
     }
 
     private void GamePhaseChangeHandler(object sender, string phase)
     {
-        if (phase == "Recruit")
+        print("The actual phase is "+phase);
+        if (phase == "Recruit"&&hasNotStarted)
         {
+            hasNotStarted = false;
             SceneManager.LoadScene("GameScene");
         }
     }

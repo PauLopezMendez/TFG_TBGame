@@ -9,9 +9,9 @@ using Colyseus.Schema;
 
 public partial class Player : Schema {
 	[Type(0, "int16")]
-	public short seat = default(short);
+	public short seat = 0;
 
 	[Type(1, "string")]
-	public string sessionId = default(string);
+	public string sessionId = "";
 }
 
