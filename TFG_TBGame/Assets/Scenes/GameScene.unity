@@ -1458,7 +1458,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 163.1, y: 83.5}
+  m_AnchoredPosition: {x: 85.3, y: -25.8}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &547412433
@@ -1483,10 +1483,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 10
+    m_FontSize: 7
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 1
+    m_MinSize: 0
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -2197,8 +2197,8 @@ MonoBehaviour:
   - {fileID: 479304911}
   toolDeck:
   - {fileID: 150714776}
-  - {fileID: 1318130328}
   - {fileID: 1039599106}
+  - {fileID: 1318130328}
   - {fileID: 488903665}
   - {fileID: 468839791}
   - {fileID: 1602145139}
@@ -2248,30 +2248,9 @@ MonoBehaviour:
   - {fileID: 60591916}
   - {fileID: 84501554}
   - {fileID: 1764235427}
-  availableCardSlotsHand: 0101010101010101
-  shopSlots:
-  - {fileID: 194369874}
-  - {fileID: 163923910}
-  - {fileID: 1935982450}
-  - {fileID: 1544853990}
-  yourRecruitSlots:
-  - {fileID: 1185103961}
-  - {fileID: 1490049961}
-  - {fileID: 1182780806}
-  availableCardSlotsRecruit: 010101
   recruitBeingUsed: {fileID: 0}
   isRecruitBeingUsed: 0
   matchingTools: []
-  yourToolboardSlots:
-  - {fileID: 109399787}
-  - {fileID: 1793253414}
-  - {fileID: 116102792}
-  - {fileID: 1595006350}
-  - {fileID: 1066037308}
-  - {fileID: 536769389}
-  - {fileID: 612346780}
-  - {fileID: 1534550423}
-  - {fileID: 502768749}
   message: {fileID: 547412433}
   OkButton: {fileID: 1987664933}
   phase: 0
@@ -7594,6 +7573,10 @@ PrefabInstance:
     - target: {fileID: 1844195688936504992, guid: 5a6ee750731e6124abad57737f289f15, type: 3}
       propertyPath: m_Name
       value: T4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1844195688936504992, guid: 5a6ee750731e6124abad57737f289f15, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1844195688936505022, guid: 5a6ee750731e6124abad57737f289f15, type: 3}
       propertyPath: gm

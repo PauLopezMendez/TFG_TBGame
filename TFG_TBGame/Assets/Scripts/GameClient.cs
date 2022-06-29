@@ -46,7 +46,6 @@ public class GameClient : GenericSingleton<GameClient>
 
     void OnDestroy()
     {
-        
         print("OnDestroy");
         if (client != null) client.Close();
     }
@@ -57,7 +56,7 @@ public class GameClient : GenericSingleton<GameClient>
         if (room != null) room.Leave();
         if (client != null) client.Close();
     }
-
+    //Conexión con el servidor
     public void Connect()
     {
         print("Connect");
@@ -67,7 +66,7 @@ public class GameClient : GenericSingleton<GameClient>
         client.OnClose += OnCloseHandler;
         StartCoroutine(ConnectAndListen());
     }
-
+    //Creación de GameRoom
     public void Join()
     {
         print("Join");
@@ -83,11 +82,7 @@ public class GameClient : GenericSingleton<GameClient>
         if (room != null) room.Leave();
         room = null;
     }
-
-    public void InitialState (){
-        room.Send(new { command = "initialState"});
-    }
-
+    //Mensajes al servidor
     public void RefreshShop (){
         room.Send(new { command = "refreshShop"});
     }
@@ -120,15 +115,12 @@ public class GameClient : GenericSingleton<GameClient>
 
     void OnCloseHandler(object sender, EventArgs e)
     {
-        
         OnClose?.Invoke(this, e);
     }
 
     void OnJoinHandler(object sender, EventArgs e)
     {
-        
         room.State.OnChange += OnStateChangeHandler;
-
         OnJoin?.Invoke(this, e);
     }
 
@@ -157,7 +149,6 @@ public class GameClient : GenericSingleton<GameClient>
     void OnMessageHandler(object sender, MessageEventArgs e)
     {
         var message = e.Message;
-
         OnMessage?.Invoke(this, message);
     }
 

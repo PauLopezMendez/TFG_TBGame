@@ -19,8 +19,6 @@ public class RecruitCard : MonoBehaviour
 
     public string id;
 
-    
-     
     public GameManager gm;
 
    private void OnMouseDown() {
@@ -51,7 +49,6 @@ public class RecruitCard : MonoBehaviour
         gm.ActivateButtons(false);
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         gm = FindObjectOfType<GameManager>();
@@ -59,12 +56,6 @@ public class RecruitCard : MonoBehaviour
         foreach(ToolCard t in toolPoolCards){
             toolPool.Add(t.tag);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     private void useRecruit(){

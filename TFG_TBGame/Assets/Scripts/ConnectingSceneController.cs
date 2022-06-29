@@ -18,7 +18,7 @@ public class ConnectingSceneController : MonoBehaviour
     {
         message.text = "Connecting...";
 
-        client = GetComponent<GameClient>();
+        client = GameClient.Instance;
         client.OnConnect += OnConnect;
         client.OnJoin += OnJoin;
 
@@ -32,15 +32,10 @@ public class ConnectingSceneController : MonoBehaviour
         }
     }
 
-    void Update(){
-;      
-    }
-
     void OnConnect(object sender, EventArgs e)
     {
         message.text = "Finding a game...";
         
-
         if (!client.Joined)
         {
             client.Join();
@@ -60,7 +55,6 @@ public class ConnectingSceneController : MonoBehaviour
 
     private void GamePhaseChangeHandler(object sender, string phase)
     {
-        print("The actual phase is "+phase);
         if (phase == "Recruit"&&hasNotStarted)
         {
             hasNotStarted = false;
